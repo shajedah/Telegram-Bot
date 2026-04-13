@@ -339,7 +339,17 @@ app = Flask(__name__)
 def home(): return "Online"
 
 if __name__ == '__main__':
-    Thread(target=lambda: app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080))), daemon=True).start()
+    # Start Flask server in background thread
+    port = int(os.environ.get("PORT", 8080))
+    flask_thread = Thread(target=lambda: app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False))
+    flask_thread.daemon = True
+    flask_thread.start()
+    
+    logging.info(f"Flask server starting on port {port}")
+    
+    # Give Flask a moment to start
+    import time
+    time.sleep(2)
     
     # Build bot with optional proxy support
     builder = ApplicationBuilder().token(TOKEN)
